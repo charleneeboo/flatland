@@ -84,7 +84,7 @@ def train_agent(env_params, train_params):
 
     # Observation builder
     predictor = ShortestPathPredictorForRailEnv(observation_max_path_depth)
-    tree_observation = GlobalObsForRailEnv(max_depth=observation_tree_depth, predictor=predictor)
+    global_observation = GlobalObsForRailEnv()
 
     # Fraction of train which each speed
     speed_profiles = {
@@ -107,7 +107,7 @@ def train_agent(env_params, train_params):
         schedule_generator=sparse_schedule_generator(speed_profiles),
         number_of_agents=n_agents,
         malfunction_generator_and_process_data=malfunction_from_params(malfunction_parameters),
-        obs_builder_object=tree_observation,
+        obs_builder_object=global_observation,
         random_seed=seed
     )
 
@@ -412,10 +412,10 @@ if __name__ == "__main__":
         "max_rails_between_cities": 2,
         "max_rails_in_city": 3,
 
-        "seed": 42,
-        "observation_tree_depth": 2,
-        "observation_radius": 10,
-        "observation_max_path_depth": 30
+        "seed": 42
+        # "observation_tree_depth": 2,
+        # "observation_radius": 10,
+        # "observation_max_path_depth": 30
     }
 
     print("\nEnvironment parameters:")
