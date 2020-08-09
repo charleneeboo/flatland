@@ -13,7 +13,7 @@ import torch
 from flatland.envs.rail_env import RailEnv, RailEnvActions
 from flatland.envs.rail_generators import sparse_rail_generator
 from flatland.envs.schedule_generators import sparse_schedule_generator
-from flatland.envs.observations import TreeObsForRailEnv
+from flatland.envs.observations import GlobalObsForRailEnv 
 
 from flatland.envs.malfunction_generators import malfunction_from_params, MalfunctionParameters
 from flatland.envs.predictions import ShortestPathPredictorForRailEnv
@@ -84,7 +84,7 @@ def train_agent(env_params, train_params):
 
     # Observation builder
     predictor = ShortestPathPredictorForRailEnv(observation_max_path_depth)
-    tree_observation = TreeObsForRailEnv(max_depth=observation_tree_depth, predictor=predictor)
+    tree_observation = GlobalObsForRailEnv(max_depth=observation_tree_depth, predictor=predictor)
 
     # Fraction of train which each speed
     speed_profiles = {
