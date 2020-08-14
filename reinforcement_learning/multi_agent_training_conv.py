@@ -23,7 +23,7 @@ sys.path.append(str(base_dir))
 
 from utils.observation_utils import normalize_observation
 from reinforcement_learning.timer import Timer
-from reinforcement_learning.dddqn_policy import DDDQNPolicy
+from reinforcement_learning.conv_dddqn_policy import DDDQNPolicy
 
 try:
     import wandb
@@ -381,7 +381,7 @@ def eval_policy(env, policy, n_eval_episodes, max_steps):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("-n", "--n_episodes", dest="n_episodes", help="number of episodes to run", default=1600, type=int)
+    parser.add_argument("-n", "--n_episodes", dest="n_episodes", help="number of episodes to run", default=2500, type=int)
     parser.add_argument("--n_evaluation_episodes", dest="n_evaluation_episodes", help="number of evaluation episodes", default=25, type=int)
     parser.add_argument("--checkpoint_interval", dest="checkpoint_interval", help="checkpoint interval", default=100, type=int)
     parser.add_argument("--eps_start", dest="eps_start", help="max exploration", default=1.0, type=float)

@@ -6,6 +6,7 @@ import torch.autograd as autograd
 # from common.replay_buffer import ReplayBuffer
 import math
 from torch.autograd import Variable
+import tensorflow as tf
 
 USE_CUDA = torch.cuda.is_available()
 Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if USE_CUDA else autograd.Variable(*args, **kwargs)
@@ -35,9 +36,58 @@ class DuelingQNetwork(nn.Module):
         adv = F.relu(self.fc1_adv(x))
         adv = F.relu(self.fc2_adv(adv))
         adv = self.fc3_adv(adv)
-
         return val + adv - adv.mean()
 
+
+class convDuelingQNetwork(nn.Module):
+    
+    def __init__(self, state_size, action_size, hidsize1=128, hidsize2=128):
+        super(convDuelingQNetwork, self).__init__()
+        print(state_size)
+        print(action_size)
+        # value network
+        self.fc1_val = nn.Conv1d(1, 1, 2)
+        self.fc2_val = nn.Conv1d(1, 1, 2)
+        
+        self.fc1b_val = nn.Conv1d(32, 1, 2)
+        self.fc2b_val = nn.Conv1d(32, 1, 2)
+        # advantage network
+        self.fc1_adv = nn.Linear(state_size, hidsize1)
+        self.fc2_adv = nn.Linear(hidsize1, hidsize2)
+        self.fc3_adv = nn.Linear(hidsize2, action_size)
+
+    def forward(self, x):
+        if len(x.shape) == 2: 
+            x=x.unsqueeze(0) # add an extra dimension
+            x=tf.transpose(x,[1,0,2])
+        # if x.shape[1] == 1: # check batch size = 1
+        val = F.relu(self.fc1_val(x)) # [1,1,230]
+        val = F.max_pool1d(val, 2) # [1,1,115]
+        val = F.relu(self.fc2_val(x)) 
+        val = F.max_pool1d(val, 2) 
+        # elif x.shape[1] == 32: # check batch size = 32
+        #     val = F.relu(self.fc1b_val(x)) # [1,1,230]
+        #     val = F.max_pool1d(val, 2) # [1,1,115]
+        #     val = F.relu(self.fc2b_val(x)) 
+        #     val = F.max_pool1d(val, 2) 
+        # val=tf.transpose(val,[1,0,2])
+        val=val.squeeze(1)
+        print("batchsize = ", x.shape[1])
+        print(val.shape)
+        self.out_val = nn.Linear(val.shape[1], 1)
+        val = self.out_val(val)
+        print("good")
+        # val = F.relu(self.fc2_val(val))
+        # val = self.fc3_val(val)
+
+        # # advantage calculation
+        # adv = F.relu(self.fc1_adv(x))
+        # adv = F.relu(self.fc2_adv(adv))
+        # adv = self.fc3_adv(adv)
+
+        # return val + adv - adv.mean()
+        return val
+    
 class DuelingQNetwork2(nn.Module):
     """Dueling Q-network (https://arxiv.org/abs/1511.06581)"""
 
