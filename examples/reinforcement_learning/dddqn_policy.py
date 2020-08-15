@@ -22,7 +22,7 @@ class DDDQNPolicy(Policy):
         self.state_size = state_size
         self.action_size = action_size
         self.double_dqn = True
-        self.hidsize = parameters.hidden_size
+        self.hidsize = 256
 
         if not evaluation_mode:
             self.hidsize = parameters.hidden_size
@@ -45,9 +45,9 @@ class DDDQNPolicy(Policy):
 
         # Q-Network
         self.qnetwork_local = DuelingQNetwork(state_size, action_size, hidsize1=self.hidsize, hidsize2=self.hidsize).to(self.device)
-
+        self.qnetwork_target = copy.deepcopy(self.qnetwork_local)
         if not evaluation_mode:
-            self.qnetwork_target = copy.deepcopy(self.qnetwork_local)
+            
             self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=self.learning_rate)
             self.memory = ReplayBuffer(action_size, self.buffer_size, self.batch_size, self.device)
 
